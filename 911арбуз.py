@@ -73,7 +73,7 @@ def save_history():
         logging.error(("Ошибка сохранения истории:%s", e))
 
 
-API_KEY = os.getenv('')
+API_KEY = os.getenv('API_KEY')
 if not API_KEY:
     logging.warning("API_KEY не задан: чат_модель будет недоступна")
 
@@ -248,4 +248,5 @@ if __name__ == "__main__":
             logging.info("Запуск бота в режиме polling")
             bot.remove_webhook()
             bot.infinity_polling(timeout=60)
+
             bot.infinity_polling(timeout=60)
