@@ -238,11 +238,13 @@ if __name__ == "__main__":
             r = requests.get(f"https://api.telegram.org/bot{TOKEN}/setWebhook",
                              params={"url": webhook_url}, timeout=10)
             logging.info("Webhook установлен: %s", r.text)
-        except Exception:
-            logging.exception("Ошибка при установке Webhook")
             port = int(os.environ.get("PORT", 10000))
             logging.info("Starting server on port %s", port)
             app.run(host='0.0.0.0', port=port)
+        except Exception:
+            logging.exception("Ошибка при установке Webhook")
+            
+
 
 
 
