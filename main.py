@@ -229,7 +229,6 @@ def slot_game(message):
     else:
         bot.send_message(message.chat.id, "Ты проиграл")
 
-bot.polling(none_stop=True)
 
 if __name__ == "__main__":
     server_url = os.getenv("RENDER_EXTERNAL_URL")
@@ -244,10 +243,6 @@ if __name__ == "__main__":
             port = int(os.environ.get("PORT", 10000))
             logging.info("Starting server on port %s", port)
             app.run(host='0.0.0.0', port=port)
-        else:
-            logging.info("Запуск бота в режиме polling")
-            bot.remove_webhook()
-            bot.infinity_polling(timeout=60)
 
-            bot.infinity_polling(timeout=60)
+
 
