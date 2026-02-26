@@ -235,7 +235,7 @@ if __name__ == "__main__":
     if server_url and TOKEN:
         webhook_url = f"{server_url.rstrip('/')}/{TOKEN}"
         try:
-            r = requests.get(f"https://api.telegram.org/hot{TOKEN}/setWebhook",
+            r = requests.get(f"https://api.telegram.org/bot{TOKEN}/setWebhook",
                              params={"url": webhook_url}, timeout=10)
             logging.info("Webhook установлен: %s", r.text)
         except Exception:
@@ -243,6 +243,7 @@ if __name__ == "__main__":
             port = int(os.environ.get("PORT", 10000))
             logging.info("Starting server on port %s", port)
             app.run(host='0.0.0.0', port=port)
+
 
 
 
