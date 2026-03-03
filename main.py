@@ -138,13 +138,13 @@ def start(message):
     if user_id not in db["users"] or db ["users"].get(user_id).get("awaiting") == ("name"):
         db["users"][user_id] = {}
         db["users"][user_id]["awaiting"] = "name"
-
+        save_db()
         bot.send_message(message.chat.id, "Введи свое имя")
 
         return
 
     db["users"][user_id]["money"] == 20000
-
+    save_db()
     keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     slot_button = telebot.types.KeyboardButton("Игровой автомат")
@@ -166,6 +166,7 @@ def text(message):
         db["users"][user_id]["name"] == message.text
         db["users"][user_id]["awaiting"] == None
         db["users"] [user_id]["money"] == 10000
+        save_db()
         start(message)
         return
 
@@ -192,6 +193,7 @@ def text(message):
                 bot.delete_message(message.chat.id, msg.message_id)
             except Exception:
                 pass
+    save_db()
 
 def dice_game(message):
     keyboard = telebot.types.InlineKeyboardMarkup(row_width=3)
@@ -250,6 +252,7 @@ if __name__ == "__main__":
         except Exception:
             logging.exception("Ошибка при установке Webhook")
             
+
 
 
 
