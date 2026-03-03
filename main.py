@@ -164,8 +164,8 @@ def text(message):
 
     if db["users"].get(user_id).get("awaiting") == "name":
         db["users"][user_id]["name"] == message.text
-        db["users"][user_id]("awaiting") == None
-        db["users"] [user_id]("money") == 10000
+        db["users"][user_id]["awaiting"] == None
+        db["users"] [user_id]["money"] == 10000
         start(message)
         return
 
@@ -229,7 +229,7 @@ def slot_game(message):
 
     elif value == 64:                                       # Три 7
         bot.send_message(message.chat.id, "Jackpot")
-        db["users"][message.chat.id]("money") == 10000
+        db["users"][message.chat.id]["money"] == 10000
         bot.send_message(message.chat.id, "Победа сумма выиграша составила 10000"
                                           f"Текуший баланс: {db['users'][message.chat.id]['money']}")
     else:
@@ -250,6 +250,7 @@ if __name__ == "__main__":
         except Exception:
             logging.exception("Ошибка при установке Webhook")
             
+
 
 
 
