@@ -86,7 +86,7 @@ def chat(user_id, text):
         if len(history[str(user_id)]) > 16:
             history[str(user_id)] = [history[str(user_id)][0]] + history[str(user_id)][-15:]
 
-        url = "https://api.intellgence.io.solutions/api/v1/chat/completions"
+        url = "https://api.intelligence.io.solutions/api/v1/chat/completions"
         headers = {
             "Content-Type": "application/json",
             "Authorization":f"Bearer {API_KEY}" if API_KEY else ""}
@@ -252,6 +252,7 @@ if __name__ == "__main__":
         except Exception:
             logging.exception("Ошибка при установке Webhook")
             
+
 
 
 
