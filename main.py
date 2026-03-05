@@ -163,9 +163,9 @@ def text(message):
     user_id = message.chat.id
 
     if db["users"].get(user_id).get("awaiting") == "name":
-        db["users"][user_id]["name"] == message.text
-        db["users"][user_id]["awaiting"] == None
-        db["users"] [user_id]["money"] == 10000
+        db["users"][user_id]["name"] = message.text
+        db["users"][user_id]["awaiting"] = None
+        db["users"] [user_id]["money"] = 10000
         save_db()
         start(message)
         return
@@ -252,6 +252,7 @@ if __name__ == "__main__":
         except Exception:
             logging.exception("Ошибка при установке Webhook")
             
+
 
 
 
