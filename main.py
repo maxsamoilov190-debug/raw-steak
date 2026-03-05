@@ -111,7 +111,7 @@ def chat(user_id, text):
             logging.error(f"Ошибка API: ")
     except Exception as e:
         logging.error(f"Ошибка при запросе")
-        send_long_message(f"ошибка при запросе: {e}, повторите попытку позже")
+        send_long_message(user_id, f"ошибка при запросе: {e}, повторите попытку позже")
 
 
 
@@ -252,6 +252,7 @@ if __name__ == "__main__":
         except Exception:
             logging.exception("Ошибка при установке Webhook")
             
+
 
 
 
