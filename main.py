@@ -4,6 +4,7 @@ import re
 import json
 import logging
 import requests
+from dotenv import load_dotenv
 from  flask import Flask, request
 import telebot
 from telebot import util
@@ -12,7 +13,9 @@ logging.basicConfig(level=logging.INFO)
 
 TOKEN = os.getenv("BOT_TOKEN")
 if not TOKEN:
-    sys.exit("Ошибка:BOT_TOKEN не задан в переменных окружения")
+    logging.warning("BOT_TOKEN не задан в переменных окружения")
+    load_dotenv(".env")
+    TOKEN = os.getenv("BOT_TOKEN")
 
 bot = telebot.TeleBot(TOKEN, parse_mode=None)
 app = Flask(__name__)
@@ -251,7 +254,7 @@ if __name__ == "__main__":
             app.run(host='0.0.0.0', port=port)
         except Exception:
             logging.exception("Ошибка при установке Webhook")
-            
+            bot.infinity_polling()
 
 
 
