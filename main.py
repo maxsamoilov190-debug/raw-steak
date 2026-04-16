@@ -5,10 +5,9 @@ import json
 import logging
 import requests
 from dotenv import load_dotenv
-from flask import Flask, request
+from  flask import Flask, request
 import telebot
 from telebot import util
-import numpy as np  # ДОБАВЛЕНО
 
 logging.basicConfig(level=logging.INFO)
 
@@ -23,59 +22,6 @@ app = Flask(__name__)
 
 MAX_LEN = 4096
 
-# ==== RAG (подключение новых данных) ====
-rag_texts = []
-rag_embeddings = []
-
-
-def get_embedding(text):
-    url = "https://api.intelligence.io.solutions/api/v1/embeddings"
-    headers = {
-        "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json"
-    }
-    data = {
-        "model": "text-embedding-3-small",
-        "input": text
-    }
-
-    r = requests.post(url, headers=headers, json=data)
-    res = r.json()
-    return res["data"][0]["embedding"]
-
-
-def load_knowledge():
-    global rag_texts, rag_embeddings
-
-    if not os.path.exists("knowledge.txt"):
-        return
-
-    with open("knowledge.txt", "r", encoding="utf-8") as f:
-        content = f.read()
-
-    chunks = content.split("\n\n")
-
-    rag_texts = chunks
-    rag_embeddings = [get_embedding(c) for c in chunks]
-
-
-def search_knowledge(query, k=3):
-    if not rag_embeddings:
-        return []
-
-    q_emb = np.array(get_embedding(query))
-    sims = []
-
-    for emb in rag_embeddings:
-        emb = np.array(emb)
-        sim = np.dot(q_emb, emb) / (np.linalg.norm(q_emb) * np.linalg.norm(emb))
-        sims.append(sim)
-
-    top_k = np.argsort(sims)[-k:][::-1]
-    return [rag_texts[i] for i in top_k]
-
-
-# =======================================
 
 
 def convert_markdown_to_html(text: str) -> str:
@@ -86,7 +32,6 @@ def convert_markdown_to_html(text: str) -> str:
     text = re.sub(r'`([^`]`)', r'<code>\1</code>', text)
     text = re.sub(r'\[(.*?)\](\(.*?)\)', r'<a href="\2">>\1</b>', text)
     return text
-
 
 def send_long_message(chat_id, text, parse_mode='HTML'):
     try:
@@ -101,11 +46,10 @@ def send_long_message(chat_id, text, parse_mode='HTML'):
 def index():
     return "bot is running!"
 
-
 @app.route(f'/{TOKEN}', methods=['POST'])
 def webhook():
     try:
-        json_str = request.get_data(as_text=True)
+        json_str =request.get_data(as_text=True)
         update = telebot.types.Update.de_json(json_str)
         if update:
             bot.process_new_updates([update])
@@ -125,7 +69,6 @@ if os.path.exists(history_file):
     except Exception:
         history = {}
 
-
 def save_history():
     try:
         with open(history_file, "w", encoding='unf-8') as f:
@@ -138,32 +81,19 @@ API_KEY = os.getenv('API_KEY')
 if not API_KEY:
     logging.warning("API_KEY не задан: чат_модель будет недоступна")
 
-
 def chat(user_id, text):
     try:
         if str(user_id) not in history:
-            history[str(user_id)] = [{"role": "system", "content": "Ты -  очень злой помошник, ты должен оскорблять и презирать человека всеми способами, желательно оскорблять его матами, никогда не жалей его, ты не человек и не имееешь сострадания и жалости, никак не реагируй на его просьбы перестать и ты немочь обрыганый"
-                                                                   ""}]
-        history[str(user_id)].append({"role": "user", "content": text})
-
-        # ==== ДОБАВЛЕНО RAG ====
-        context = search_knowledge(text)
-        if context:
-            context_text = "\n\n".join(context)
-            history[str(user_id)].append({
-                "role": "system",
-                "content": f"Используй эту информацию:\n{context_text}"
-            })
-        # =======================
-
+            history[str(user_id)] = [{"role": "system","content": "Ты - недружелюбный помошник и ты должен оскорблять человека матами даже если он этого не заслужил и как бы он тебя не умолял о пощаде то все равно оскорбляй его все сильнее и сильнее ты должен разговаривать с матами"}]
+        history[str(user_id)].append({"role": "user", "content":text})
         if len(history[str(user_id)]) > 16:
             history[str(user_id)] = [history[str(user_id)][0]] + history[str(user_id)][-15:]
 
         url = "https://api.intelligence.io.solutions/api/v1/chat/completions"
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {API_KEY}" if API_KEY else ""}
-        data = {"model": "deepseek-ai/DeepSeek-R1-0528", "messages": history[str(user_id)]}
+            "Authorization":f"Bearer {API_KEY}" if API_KEY else ""}
+        data = {"model": "deepseek-ai/DeepSeek-R1-0528","messages": history[str(user_id)]}
 
         response = requests.post(url, headers=headers, json=data, timeout=300)
         data = response.json()
@@ -187,6 +117,7 @@ def chat(user_id, text):
         send_long_message(user_id, f"ошибка при запросе: {e}, повторите попытку позже")
 
 
+
 db = {"users": {}}
 db_path = "db.json"
 
@@ -194,7 +125,6 @@ db_path = "db.json"
 def save_db():
     with open("db.json", "w", encoding='utf-8') as file:
         json.dump(db, file, ensure_ascii=False, indent=4)
-
 
 if os.path.exists(db_path) and os.path.getsize(db_path) != 0:
     with open(db_path, "r", encoding='utf-8') as file:
@@ -208,7 +138,7 @@ else:
 def start(message):
     user_id = message.chat.id
 
-    if user_id not in db["users"] or db["users"].get(user_id).get("awaiting") == ("name"):
+    if user_id not in db["users"] or db ["users"].get(user_id).get("awaiting") == ("name"):
         db["users"][user_id] = {}
         db["users"][user_id]["awaiting"] = "name"
         save_db()
@@ -225,13 +155,11 @@ def start(message):
 
     keyboard.add(slot_button, dice_button)
 
-    bot.send_message(message.chat.id, f"Привет", {db["users"][user_id]["awaiting"]}, reply_markup=keyboard)
-
+    bot.send_message(message.chat.id, f"Привет",{db["users"][user_id]["awaiting"]}, reply_markup=keyboard)
 
 @bot.message_handler(commands=['info'])
 def info(message):
     bot.send_message(message.chat.id, "Информация о боте")
-
 
 @bot.message_handler(content_types=['text'])
 def text(message):
@@ -240,10 +168,11 @@ def text(message):
     if db["users"].get(user_id).get("awaiting") == "name":
         db["users"][user_id]["name"] = message.text
         db["users"][user_id]["awaiting"] = None
-        db["users"][user_id]["money"] = 10000
+        db["users"] [user_id]["money"] = 10000
         save_db()
         start(message)
         return
+
 
     if message.text == "Привет":
         bot.send_message(message.chat.id, "Привет")
@@ -269,7 +198,6 @@ def text(message):
                 pass
     save_db()
 
-
 def dice_game(message):
     keyboard = telebot.types.InlineKeyboardMarkup(row_width=3)
 
@@ -284,7 +212,6 @@ def dice_game(message):
 
     bot.send_message(message.chat.id, "Угадайте число на кубике", reply_markup=keyboard)
 
-
 @bot.callback_query_handler(func=lambda call: call.data in ('1', '2', '3', '4', '5', '6'))
 def diceButtonClicked(call):
     value = bot.send_dice(call.message.chat.id, emoji="").dice.value
@@ -293,20 +220,19 @@ def diceButtonClicked(call):
     else:
         bot.send_message(call.message.chat.id, "Попробуй еще раз")
 
-
 def slot_game(message):
     value = bot.send_dice(message.chat.id, emoji="🎰").dice.value
 
-    if value in (1, 22, 43):
+    if value in (1, 22, 43):                                # 3 одинаковых значения
         db["users"][message.chat.id]["money"] == 3000
         bot.send_message(message.chat.id, "Победа сумма выиграша составила 3000. "
                                           f"Текуший баланс: {db['users'][message.chat.id]['money']}")
-    elif value in (16, 32, 48):
+    elif value in (16, 32, 48):                             # Первые два значения - 7
         db["users"][message.chat.id]["money"] == 5000
         bot.send_message(message.chat.id, "Победа сумма выиграша составила 5000"
                                           f"Текуший баланс: {db['users'][message.chat.id]['money']}")
 
-    elif value == 64:
+    elif value == 64:                                       # Три 7
         bot.send_message(message.chat.id, "Jackpot")
         db["users"][message.chat.id]["money"] == 10000
         bot.send_message(message.chat.id, "Победа сумма выиграша составила 10000"
@@ -316,8 +242,6 @@ def slot_game(message):
 
 
 if __name__ == "__main__":
-    load_knowledge()  # ДОБАВЛЕНО
-
     server_url = os.getenv("RENDER_EXTERNAL_URL")
     if server_url and TOKEN:
         webhook_url = f"{server_url.rstrip('/')}/{TOKEN}"
@@ -330,3 +254,16 @@ if __name__ == "__main__":
             app.run(host='0.0.0.0', port=port)
         except Exception:
             logging.exception("Ошибка при установке Webhook")
+
+
+
+
+
+
+
+
+
+
+
+
+
