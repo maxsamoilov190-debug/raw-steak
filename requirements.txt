@@ -3,4 +3,3 @@ requests
 gdown
 Flask
 python-dotenv
-numpy
