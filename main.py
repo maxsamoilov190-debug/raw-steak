@@ -136,13 +136,19 @@ else:
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    user_id = message.chat.id
+    try
+        user_id = message.chat.id
 
     if user_id not in db["users"] or db ["users"].get(user_id).get("awaiting") == ("name"):
         db["users"][user_id] = {}
         db["users"][user_id]["awaiting"] = "name"
         save_db()
         bot.send_message(message.chat.id, "Введи свое имя")
+        role_button = telebot.types.KeyboardButton(text="Сменить Роль")
+        keyboard.add(role_button)
+
+except Exception as e:
+bot.reply_to(message, f"Ошибка: {e}")
 
         return
 
@@ -169,6 +175,16 @@ def text(message):
         db["users"][user_id]["name"] = message.text
         db["users"][user_id]["awaiting"] = None
         db["users"] [user_id]["money"] = 10000
+
+    elif text == "Сменить роль":
+        keyboard = telebot.types.InlineKeyboardMarkup(row_width=2)
+        btn_default = telebot.types.InlineKeyboardButton("Помощник", callback_data"role_default")
+        btn_tribe = telebot.types.InlineKeyboardButton("Пещерный человек", callback_data="role_tribe")
+        btn_scientist = telebot.types.InlineKeyboardButton("Ученый кв. Физики", callback_data"role_scientist")
+        keyboard.add(btn_default, btn_tribe, btn_scientist)
+        bot.send_message(message.chat.id,
+                         "Выбери новую личность для нейросети. Внимание: это очистит историю диалога",
+                         reply_markup=keyboard)
         save_db()
         start(message)
         return
