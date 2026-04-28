@@ -136,7 +136,7 @@ else:
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    try
+    try:
         user_id = message.chat.id
 
     if user_id not in db["users"] or db ["users"].get(user_id).get("awaiting") == ("name"):
@@ -229,6 +229,18 @@ def dice_game(message):
     bot.send_message(message.chat.id, "Угадайте число на кубике", reply_markup=keyboard)
 
 @bot.callback_query_handler(func=lambda call: call.data in ('1', '2', '3', '4', '5', '6'))
+
+def set_role(call):
+    role_key = call.data.replace("role_", "")
+    user_id = str(call.message.chat.id)
+
+    new_system_prompt = ROLES.get(role_key, ROLES["default'])
+
+    history[user_id] = {
+        {"role": "system", "content": new_system_prompt}
+    }
+
+    save_history()
 def diceButtonClicked(call):
     value = bot.send_dice(call.message.chat.id, emoji="").dice.value
     if str(value) == call.data:
