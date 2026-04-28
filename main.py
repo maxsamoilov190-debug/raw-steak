@@ -139,13 +139,18 @@ def start(message):
     try:
         user_id = message.chat.id
 
-    if user_id not in db["users"] or db ["users"].get(user_id).get("awaiting") == ("name"):
+        if user_id not in db["users"] or db["users"].get(user_id).get("awaiting") == "name":
         db["users"][user_id] = {}
         db["users"][user_id]["awaiting"] = "name"
         save_db()
         bot.send_message(message.chat.id, "Введи свое имя")
         role_button = telebot.types.KeyboardButton(text="Сменить Роль")
         keyboard.add(role_button)
+
+
+except Exception as e:
+    print(f"Ошибка: {e}")
+    bot.send_message(message.chat.id, "Произошла ошибка, попробуйте позже.")
 
 except Exception as e:
 bot.reply_to(message, f"Ошибка: {e}")
