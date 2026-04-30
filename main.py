@@ -139,7 +139,7 @@ def start(message):
     try:
         user_id = message.chat.id
 
-        if user_id not in db["users"] or db["users"].get(user_id).get("awaiting") == "name":
+        user_id not in db["users"] or db["users"].get(user_id).get("awaiting") == "name":
         db["users"][user_id] = {}
         db["users"][user_id]["awaiting"] = "name"
         save_db()
